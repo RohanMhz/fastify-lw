@@ -4,7 +4,12 @@
 import Fastify from 'fastify'
 // import dotenv from 'dotenv'
 import fastifyEnv from '@fastify/env'
-import routes from './routes/index.js'
+import autoload from '@fastify/autoload'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const fastify = Fastify({
   logger: true
@@ -33,8 +38,15 @@ const options = {
 try {
   await fastify.register(fastifyEnv, options)
   
-  // Declare routes
-  fastify.register(routes);
+  // registering plugins
+  fastify.register(autoload, {
+    dir: join(__dirname, 'app/plugins')
+  })
+  
+  // Register routes
+  fastify.register(autoload, {
+    dir: join(__dirname, 'app/routes')
+  })
   
   // Use the env variable for port
   const port = parseInt(fastify.config.PORT, 10)
