@@ -36,21 +36,29 @@ const options = {
 
 // Run the server!
 try {
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = dirname(__filename)
+
   await fastify.register(fastifyEnv, options)
   
   // registering plugins
   fastify.register(autoload, {
-    dir: join(__dirname, 'app/plugins')
+    dir: join(__dirname, 'app/plugins'),
+    options: {}
   })
-  
+
   // Register routes
   fastify.register(autoload, {
-    dir: join(__dirname, 'app/routes')
+    dir: join(__dirname, 'app/routes'),
+    options: {}
   })
+  
   
   // Use the env variable for port
   const port = parseInt(fastify.config.PORT, 10)
-
+  fastify.after(() => {
+    const routesT = fastify.printRoutes();
+  });
   // Start the server
   await fastify.listen({ port })
 
